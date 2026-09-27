@@ -37,5 +37,8 @@ def load_events(events: list[Event]) -> duckdb.DuckDBPyConnection:
         )
         for event in events
     ]
+    # One transaction for the whole batch: far faster than committing each row.
+    con.execute("BEGIN TRANSACTION")
     con.executemany(INSERT_ROW, rows)
+    con.execute("COMMIT")
     return con
